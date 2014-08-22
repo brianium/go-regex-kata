@@ -1,9 +1,10 @@
 package regexkata
 
-import "testing"
-
-import "regexp"
-import "unicode/utf8"
+import (
+	"regexp"
+	"testing"
+	"unicode/utf8"
+)
 
 //Match pattern against byte array
 func TestMatch(t *testing.T) {
