@@ -1,6 +1,7 @@
 package regexkata
 
 import "testing"
+
 import "regexp"
 import "unicode/utf8"
 
@@ -54,10 +55,44 @@ func TestMatchString(t *testing.T) {
 	}
 }
 
+//MatchString using regexp producted by regexp.QuoteMeta
 func TestMatchStringWithQuoteMeta(t *testing.T) {
 	pattern, str := regexp.QuoteMeta("[foo]"), "[foo]"
 
 	if match, err := regexp.MatchString(pattern, str); match != true {
 		t.Errorf("MatchString did not match %q %v", str, err)
 	}
+}
+
+//Compiling a regular expression
+func TestCompileRegexp(t *testing.T) {
+	regex, err := regexp.Compile("^(B|b)rian$")
+
+	if regex == nil {
+		t.Errorf("Regex did not compile %v", err)
+	}
+}
+
+//Compiled regex are safe for access from multiple go routines
+func TestCompiledRegexInGoRoutine(t *testing.T) {
+	regex, err := regexp.Compile("^(B|b)rian$")
+	if err != nil {
+		t.Errorf("Regex did not compile %v", err)
+	}
+
+	ch := make(chan bool)
+	tests := []string{"brian", "Brian"}
+	for _, test := range tests {
+		go func(t string) {
+			ch <- regex.MatchString(t)
+		}(test)
+	}
+
+	first, second := <-ch, <-ch
+
+	if first && second {
+		return
+	}
+
+	t.Error("String did not match")
 }
