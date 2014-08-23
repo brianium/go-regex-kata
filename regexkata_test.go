@@ -97,3 +97,33 @@ func TestCompiledRegexInGoRoutine(t *testing.T) {
 
 	t.Error("String did not match")
 }
+
+//Expand matches in a template
+func TestExpand(t *testing.T) {
+	regex, err := regexp.Compile(`^(Brian)[\s]+Scaturro$`)
+	if err != nil {
+		t.Error("Regexp could not compile")
+	}
+	subject, template := []byte("Brian Scaturro"), []byte("Your name is $1")
+	dest := make([]byte, 0)
+	expanded := regex.Expand(dest, template, subject, regex.FindSubmatchIndex(subject))
+	destStr := string(expanded)
+	if destStr != "Your name is Brian" {
+		t.Errorf("Expected 'Your name is Brian' got '%q'", destStr)
+	}
+}
+
+//ExpandString matches using strings
+func TestExpandString(t *testing.T) {
+	regex, err := regexp.CompilePOSIX("Set|SetValue")
+	if err != nil {
+		t.Error("Regexp could not compile")
+	}
+	subject, template := "SetValue", "POSIX match was $0"
+	dest := make([]byte, 0)
+	expanded := regex.ExpandString(dest, template, subject, regex.FindStringSubmatchIndex(subject))
+	destStr := string(expanded)
+	if destStr != "POSIX match was SetValue" {
+		t.Errorf("Expected 'POSIX match was SetValue' got '%q'", destStr)
+	}
+}
