@@ -127,3 +127,44 @@ func TestExpandString(t *testing.T) {
 		t.Errorf("Expected 'POSIX match was SetValue' got '%q'", destStr)
 	}
 }
+
+//Find should return leftmost match
+func TestFind(t *testing.T) {
+	regex, err := regexp.Compile("Set|SetValue")
+	if err != nil {
+		t.Error("Regexp could not compile")
+	}
+	subject := []byte{'S', 'e', 't', 'V', 'a', 'l', 'u', 'e'}
+	match := regex.Find(subject)
+	if match == nil {
+		t.Error("Could not find match for regexp.Find")
+		return
+	}
+	str := string(match)
+	if str != "Set" {
+		t.Errorf("Expected 'Set', got %q", str)
+	}
+}
+
+//FindAll should return all matches
+func TestFindAll(t *testing.T) {
+	regex, err := regexp.Compile("(brian|bryce|jason)")
+	if err != nil {
+		t.Error("Regexp could not compile")
+	}
+	subject := []byte("brian and bryce and jason are rad dudes")
+	expected := []string{"brian", "bryce", "jason"}
+
+	matches := regex.FindAll(subject, 3)
+
+	if matches == nil {
+		t.Error("Could not find matches for regexp.FindAll")
+	}
+
+	for i, match := range matches {
+		strMatch := string(match)
+		if strMatch != expected[i] {
+			t.Errorf("Expected '%q', got '%q'", expected[i], strMatch)
+		}
+	}
+}
