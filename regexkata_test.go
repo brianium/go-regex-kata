@@ -168,3 +168,29 @@ func TestFindAll(t *testing.T) {
 		}
 	}
 }
+
+//start using a helper function with dynamic types for assertion
+func assert(expected interface{}, actual interface{}, t *testing.T) {
+	if expected != actual {
+		t.Errorf("Expected '%v', got '%v'", expected, actual)
+	}
+}
+
+//FindIndex should return location of match - now enforcing compilation to save on error checks
+func TestFindIndex(t *testing.T) {
+	regex := regexp.MustCompile("Brian")
+	subject := []byte("My name is Brian, pleased to meet you")
+	index := regex.FindIndex(subject)
+	assert(index[0], 11, t)
+	assert(index[1], 16, t)
+}
+
+func TestFindAllIndex(t *testing.T) {
+	regex := regexp.MustCompile("Brian")
+	subject := []byte("Brian, your name is Brian right?")
+	indexes := regex.FindAllIndex(subject, 2)
+	assert(indexes[0][0], 0, t)
+	assert(indexes[0][1], 5, t)
+	assert(indexes[1][0], 20, t)
+	assert(indexes[1][1], 25, t)
+}
