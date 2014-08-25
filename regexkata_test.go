@@ -185,6 +185,7 @@ func TestFindIndex(t *testing.T) {
 	assert(index[1], 16, t)
 }
 
+//FindAllIndex should return a collection of indexes
 func TestFindAllIndex(t *testing.T) {
 	regex := regexp.MustCompile("Brian")
 	subject := []byte("Brian, your name is Brian right?")
@@ -193,4 +194,21 @@ func TestFindAllIndex(t *testing.T) {
 	assert(indexes[0][1], 5, t)
 	assert(indexes[1][0], 20, t)
 	assert(indexes[1][1], 25, t)
+}
+
+//FindString should return a matched string
+func TestFindString(t *testing.T) {
+	regex := regexp.MustCompile("Brian")
+	subject := "Hello Brian"
+	match := regex.FindString(subject)
+	assert("Brian", match, t)
+}
+
+//FindAllString should return all matching strings
+func TestFindAllString(t *testing.T) {
+	regex := regexp.MustCompile("Brian|Austin")
+	subject := "Hello Austin, this is Brian"
+	matches := regex.FindAllString(subject, 2)
+	assert("Austin", matches[0], t)
+	assert("Brian", matches[1], t)
 }
