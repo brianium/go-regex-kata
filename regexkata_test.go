@@ -212,3 +212,23 @@ func TestFindAllString(t *testing.T) {
 	assert("Austin", matches[0], t)
 	assert("Brian", matches[1], t)
 }
+
+//FindStringIndex should return index of string
+func TestFindStringIndex(t *testing.T) {
+	regex := regexp.MustCompile("Brian")
+	subject := "Hello Brian"
+	index := regex.FindStringIndex(subject)
+	assert(6, index[0], t)
+	assert(11, index[1], t)
+}
+
+//FindAllStringIndex should return multiple indexes
+func TestFindAllStringIndex(t *testing.T) {
+	regex := regexp.MustCompile("Brian")
+	subject := "Brian. Meet Brian"
+	indexes := regex.FindAllStringIndex(subject, 2)
+	assert(0, indexes[0][0], t)
+	assert(5, indexes[0][1], t)
+	assert(12, indexes[1][0], t)
+	assert(17, indexes[1][1], t)
+}
