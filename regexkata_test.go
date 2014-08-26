@@ -232,3 +232,18 @@ func TestFindAllStringIndex(t *testing.T) {
 	assert(12, indexes[1][0], t)
 	assert(17, indexes[1][1], t)
 }
+
+//FindStringSubmatch should return an array of submathces
+func TestFindStringSubmatch(t *testing.T) {
+	regex := regexp.MustCompile("Hello.*(world)")
+	subject := "Hello brave new world"
+	matches := regex.FindStringSubmatch(subject)
+	assert("world", matches[1], t)
+}
+
+func TestFindAllStringSubmatch(t *testing.T) {
+	regex := regexp.MustCompile("a(x*)b")
+	matches := regex.FindAllStringSubmatch("-axxb-ab-", -1)
+	assert("xx", matches[0][1], t)
+	assert("", matches[1][1], t)
+}
