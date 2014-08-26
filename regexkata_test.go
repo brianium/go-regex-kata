@@ -169,8 +169,8 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
-//start using a helper function with dynamic types for assertion
-func assert(expected interface{}, actual interface{}, t *testing.T) {
+//start using a helper function with dynamic types for Assertion
+func Assert(expected interface{}, actual interface{}, t *testing.T) {
 	if expected != actual {
 		t.Errorf("Expected '%v', got '%v'", expected, actual)
 	}
@@ -181,8 +181,8 @@ func TestFindIndex(t *testing.T) {
 	regex := regexp.MustCompile("Brian")
 	subject := []byte("My name is Brian, pleased to meet you")
 	index := regex.FindIndex(subject)
-	assert(index[0], 11, t)
-	assert(index[1], 16, t)
+	Assert(index[0], 11, t)
+	Assert(index[1], 16, t)
 }
 
 //FindAllIndex should return a collection of indexes
@@ -190,10 +190,10 @@ func TestFindAllIndex(t *testing.T) {
 	regex := regexp.MustCompile("Brian")
 	subject := []byte("Brian, your name is Brian right?")
 	indexes := regex.FindAllIndex(subject, 2)
-	assert(indexes[0][0], 0, t)
-	assert(indexes[0][1], 5, t)
-	assert(indexes[1][0], 20, t)
-	assert(indexes[1][1], 25, t)
+	Assert(indexes[0][0], 0, t)
+	Assert(indexes[0][1], 5, t)
+	Assert(indexes[1][0], 20, t)
+	Assert(indexes[1][1], 25, t)
 }
 
 //FindString should return a matched string
@@ -201,7 +201,7 @@ func TestFindString(t *testing.T) {
 	regex := regexp.MustCompile("Brian")
 	subject := "Hello Brian"
 	match := regex.FindString(subject)
-	assert("Brian", match, t)
+	Assert("Brian", match, t)
 }
 
 //FindAllString should return all matching strings
@@ -209,8 +209,8 @@ func TestFindAllString(t *testing.T) {
 	regex := regexp.MustCompile("Brian|Austin")
 	subject := "Hello Austin, this is Brian"
 	matches := regex.FindAllString(subject, 2)
-	assert("Austin", matches[0], t)
-	assert("Brian", matches[1], t)
+	Assert("Austin", matches[0], t)
+	Assert("Brian", matches[1], t)
 }
 
 //FindStringIndex should return index of string
@@ -218,8 +218,8 @@ func TestFindStringIndex(t *testing.T) {
 	regex := regexp.MustCompile("Brian")
 	subject := "Hello Brian"
 	index := regex.FindStringIndex(subject)
-	assert(6, index[0], t)
-	assert(11, index[1], t)
+	Assert(6, index[0], t)
+	Assert(11, index[1], t)
 }
 
 //FindAllStringIndex should return multiple indexes
@@ -227,10 +227,10 @@ func TestFindAllStringIndex(t *testing.T) {
 	regex := regexp.MustCompile("Brian")
 	subject := "Brian. Meet Brian"
 	indexes := regex.FindAllStringIndex(subject, 2)
-	assert(0, indexes[0][0], t)
-	assert(5, indexes[0][1], t)
-	assert(12, indexes[1][0], t)
-	assert(17, indexes[1][1], t)
+	Assert(0, indexes[0][0], t)
+	Assert(5, indexes[0][1], t)
+	Assert(12, indexes[1][0], t)
+	Assert(17, indexes[1][1], t)
 }
 
 //FindStringSubmatch should return an array of submathces
@@ -238,12 +238,12 @@ func TestFindStringSubmatch(t *testing.T) {
 	regex := regexp.MustCompile("Hello.*(world)")
 	subject := "Hello brave new world"
 	matches := regex.FindStringSubmatch(subject)
-	assert("world", matches[1], t)
+	Assert("world", matches[1], t)
 }
 
 func TestFindAllStringSubmatch(t *testing.T) {
 	regex := regexp.MustCompile("a(x*)b")
 	matches := regex.FindAllStringSubmatch("-axxb-ab-", -1)
-	assert("xx", matches[0][1], t)
-	assert("", matches[1][1], t)
+	Assert("xx", matches[0][1], t)
+	Assert("", matches[1][1], t)
 }
