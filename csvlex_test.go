@@ -11,12 +11,12 @@ func AssertNotNull(obj interface{}, t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	lex := New("src")
+	lex := New([]byte("src"))
 	AssertNotNull(lex, t)
 }
 
 func TestGetNext(t *testing.T) {
-	lex := New(`One,Two,Three`)
+	lex := New([]byte("One,Two,Three"))
 	token := lex.GetNext()
 	Assert(PlainFieldToken, token.Token, t)
 	Assert("One", token.Value, t)
