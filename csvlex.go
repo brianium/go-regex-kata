@@ -27,25 +27,24 @@ type CsvToken struct {
 	Value string
 }
 
-func keys(mp map[string]int) []string {
-	ks := make([]string, 0, len(mp))
-	for k := range mp {
+func patterns() []string {
+	ks := make([]string, 0, len(tokens))
+	for k := range tokens {
 		ks = append(ks, k)
 	}
 	return ks
 }
 
-func compile(tokenMap map[string]int) *regexp.Regexp {
+func compile() *regexp.Regexp {
 	buffer := new(bytes.Buffer)
 	buffer.WriteString("((")
-	patterns := keys(tokenMap)
-	buffer.WriteString(strings.Join(patterns, ")|("))
+	buffer.WriteString(strings.Join(patterns(), ")|("))
 	buffer.WriteString("))")
 	return regexp.MustCompile(buffer.String())
 }
 
 func New(src []byte) *CsvLexer {
-	return &CsvLexer{Src: src, Pattern: compile(tokens)}
+	return &CsvLexer{Src: src, Pattern: compile()}
 }
 
 func (l *CsvLexer) GetNext() *CsvToken {
