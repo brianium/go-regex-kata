@@ -19,5 +19,5 @@ func TestGetNext(t *testing.T) {
 	lex := New([]byte("One,Two,Three"))
 	token := lex.GetNext()
 	Assert(PlainFieldToken, token.Token, t)
-	Assert("One", token.Value, t)
+	Assert("One", string(token.Value), t)
 }

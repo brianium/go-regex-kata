@@ -25,7 +25,7 @@ type CsvLexer struct {
 
 type CsvToken struct {
 	Token int
-	Value string
+	Value []byte
 }
 
 func keys(mp map[string]int) []string {
@@ -62,5 +62,5 @@ func New(src []byte) *CsvLexer {
 func (l *CsvLexer) GetNext() *CsvToken {
 	subject := l.Src[l.offset:]
 	match := l.Pattern.FindSubmatch(subject)
-	return &CsvToken{Token: PlainFieldToken, Value: string(match[0])}
+	return &CsvToken{Token: PlainFieldToken, Value: match[1]}
 }
