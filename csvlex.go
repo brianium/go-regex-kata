@@ -1,6 +1,9 @@
 package regexkata
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
 import "bytes"
 import "strings"
 
@@ -49,9 +52,9 @@ var tokens = values(tokenMap)
 
 func compile() *regexp.Regexp {
 	buffer := new(bytes.Buffer)
-	buffer.WriteString("((")
+	buffer.WriteString("(")
 	buffer.WriteString(strings.Join(patterns, ")|("))
-	buffer.WriteString("))")
+	buffer.WriteString(")")
 	return regexp.MustCompile(buffer.String())
 }
 
@@ -59,8 +62,24 @@ func New(src []byte) *CsvLexer {
 	return &CsvLexer{Src: src, Pattern: compile()}
 }
 
-func (l *CsvLexer) GetNext() *CsvToken {
+func (l *CsvLexer) GetNext() (token *CsvToken) {
 	subject := l.Src[l.offset:]
-	match := l.Pattern.FindSubmatch(subject)
-	return &CsvToken{Token: PlainFieldToken, Value: match[1]}
+	indexes := l.Pattern.FindSubmatchIndex(subject)
+	indexes = indexes[2:]
+	var index int
+	for i := 0; i < len(indexes); i++ {
+		if indexes[i] > 0 {
+			index = i
+			break
+		}
+	}
+
+	value := subject[0:indexes[index]]
+	fmt.Printf("Index = %d, Indexes = %v\n", index, indexes)
+	tokenType := tokens[index/2]
+
+	fmt.Printf("%v %v\n", string(value), tokenType)
+	token = &CsvToken{Token: tokenType, Value: value}
+	l.offset = indexes[index]
+	return
 }

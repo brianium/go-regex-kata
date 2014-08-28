@@ -21,3 +21,13 @@ func TestGetNext(t *testing.T) {
 	Assert(PlainFieldToken, token.Token, t)
 	Assert("One", string(token.Value), t)
 }
+
+func TestGetSequentialTokens(t *testing.T) {
+	lex := New([]byte("One,Two,Three"))
+	var token *CsvToken
+	for i := 0; i < 2; i++ {
+		token = lex.GetNext()
+	}
+	Assert(FieldSeparatorToken, token.Token, t)
+	Assert(",", string(token.Value), t)
+}
