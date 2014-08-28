@@ -1,11 +1,10 @@
 package regexkata
 
 import (
-	"fmt"
+	"bytes"
 	"regexp"
+	"strings"
 )
-import "bytes"
-import "strings"
 
 const PlainFieldToken = 1
 const QuotedFieldToken = 2
@@ -13,11 +12,18 @@ const FieldSeparatorToken = 3
 const LineSeparatorToken = 4
 
 //internal map of patterns to tokens
-var tokenMap = map[string]int{
-	`[^",\r\n]+`:                     PlainFieldToken,
-	`"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"`: QuotedFieldToken,
-	`,`:        FieldSeparatorToken,
-	`\r\n?|\n`: LineSeparatorToken,
+var patterns = []string{
+	`[^",\r\n]+`,
+	`"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"`,
+	`,`,
+	`\r\n?|\n`,
+}
+
+var tokens = []int{
+	PlainFieldToken,
+	QuotedFieldToken,
+	FieldSeparatorToken,
+	LineSeparatorToken,
 }
 
 type CsvLexer struct {
@@ -30,25 +36,6 @@ type CsvToken struct {
 	Token int
 	Value []byte
 }
-
-func keys(mp map[string]int) []string {
-	ks := make([]string, 0, len(mp))
-	for k := range mp {
-		ks = append(ks, k)
-	}
-	return ks
-}
-
-func values(mp map[string]int) []int {
-	vals := make([]int, 0, len(mp))
-	for _, v := range mp {
-		vals = append(vals, v)
-	}
-	return vals
-}
-
-var patterns = keys(tokenMap)
-var tokens = values(tokenMap)
 
 func compile() *regexp.Regexp {
 	buffer := new(bytes.Buffer)
@@ -73,13 +60,7 @@ func (l *CsvLexer) GetNext() (token *CsvToken) {
 			break
 		}
 	}
-
-	value := subject[0:indexes[index]]
-	fmt.Printf("Index = %d, Indexes = %v\n", index, indexes)
-	tokenType := tokens[index/2]
-
-	fmt.Printf("%v %v\n", string(value), tokenType)
-	token = &CsvToken{Token: tokenType, Value: value}
+	token = &CsvToken{Token: tokens[index/2], Value: subject[0:indexes[index]]}
 	l.offset = indexes[index]
 	return
 }
