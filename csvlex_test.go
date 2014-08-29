@@ -50,14 +50,7 @@ func TestGetNextTokenReturnsNilWhenNoMatch(t *testing.T) {
 
 func TestLexAll(t *testing.T) {
 	lex := New([]byte(`One,Two` + "\n" + `"Three","Four"`))
-	tokens := make([]*CsvToken, 0)
-	tokens = append(tokens, lex.GetNext())
-	tokens = append(tokens, lex.GetNext())
-	tokens = append(tokens, lex.GetNext())
-	tokens = append(tokens, lex.GetNext())
-	tokens = append(tokens, lex.GetNext())
-	tokens = append(tokens, lex.GetNext())
-	tokens = append(tokens, lex.GetNext())
+	tokens := lex.LexAll()
 
 	AssertToken(PlainFieldToken, "One", tokens[0], t)
 	AssertToken(FieldSeparatorToken, ",", tokens[1], t)
