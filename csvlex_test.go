@@ -10,6 +10,11 @@ func AssertNotNull(obj interface{}, t *testing.T) {
 	}
 }
 
+func AssertToken(tokInt int, val string, tok *CsvToken, t *testing.T) {
+	Assert(tokInt, tok.Token, t)
+	Assert(val, string(tok.Value), t)
+}
+
 func TestNew(t *testing.T) {
 	lex := New([]byte("src"))
 	AssertNotNull(lex, t)
@@ -30,4 +35,35 @@ func TestGetSequentialTokens(t *testing.T) {
 	}
 	Assert(FieldSeparatorToken, token.Token, t)
 	Assert(",", string(token.Value), t)
+}
+
+func TestGetNextTokenReturnsNilWhenNoMatch(t *testing.T) {
+	lex := New([]byte("One"))
+	var token *CsvToken
+	for i := 0; i < 2; i++ {
+		token = lex.GetNext()
+	}
+	if token != nil {
+		t.Error("Expected token to be nil")
+	}
+}
+
+func TestLexAll(t *testing.T) {
+	lex := New([]byte(`One,Two` + "\n" + `"Three","Four"`))
+	tokens := make([]*CsvToken, 0)
+	tokens = append(tokens, lex.GetNext())
+	tokens = append(tokens, lex.GetNext())
+	tokens = append(tokens, lex.GetNext())
+	tokens = append(tokens, lex.GetNext())
+	tokens = append(tokens, lex.GetNext())
+	tokens = append(tokens, lex.GetNext())
+	tokens = append(tokens, lex.GetNext())
+
+	AssertToken(PlainFieldToken, "One", tokens[0], t)
+	AssertToken(FieldSeparatorToken, ",", tokens[1], t)
+	AssertToken(PlainFieldToken, "Two", tokens[2], t)
+	AssertToken(LineSeparatorToken, "\n", tokens[3], t)
+	AssertToken(QuotedFieldToken, `"Three"`, tokens[4], t)
+	AssertToken(FieldSeparatorToken, ",", tokens[5], t)
+	AssertToken(QuotedFieldToken, `"Four"`, tokens[6], t)
 }

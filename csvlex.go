@@ -16,7 +16,7 @@ var patterns = []string{
 	`[^",\r\n]+`,
 	`"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"`,
 	`,`,
-	`\r\n?|\n`,
+	"\r\n?|\n",
 }
 
 var tokens = []int{
@@ -52,15 +52,28 @@ func New(src []byte) *CsvLexer {
 func (l *CsvLexer) GetNext() (token *CsvToken) {
 	subject := l.Src[l.offset:]
 	indexes := l.Pattern.FindSubmatchIndex(subject)
+	if indexes == nil {
+		return nil
+	}
 	indexes = indexes[2:]
 	var index int
-	for i := 0; i < len(indexes); i++ {
+	for i := range indexes {
 		if indexes[i] > 0 {
 			index = i
 			break
 		}
 	}
 	token = &CsvToken{Token: tokens[index/2], Value: subject[0:indexes[index]]}
-	l.offset = indexes[index]
+	l.offset = l.offset + indexes[index]
 	return
+}
+
+func (l *CsvLexer) LexAll() []*CsvToken {
+	tokens := make([]*CsvToken, 0)
+	token := l.GetNext()
+	for token != nil {
+		tokens = append(tokens, token)
+		token = l.GetNext()
+	}
+	return tokens
 }
