@@ -22,7 +22,10 @@ func TestNew(t *testing.T) {
 
 func TestGetNext(t *testing.T) {
 	lex := New([]byte("One,Two,Three"))
-	token := lex.GetNext()
+	token, err := lex.GetNext()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 	Assert(PlainFieldToken, token.Token, t)
 	Assert("One", string(token.Value), t)
 }
@@ -30,8 +33,12 @@ func TestGetNext(t *testing.T) {
 func TestGetSequentialTokens(t *testing.T) {
 	lex := New([]byte("One,Two,Three"))
 	var token *CsvToken
+	var err error
 	for i := 0; i < 2; i++ {
-		token = lex.GetNext()
+		token, err = lex.GetNext()
+		if err != nil {
+			t.Errorf(err.Error())
+		}
 	}
 	Assert(FieldSeparatorToken, token.Token, t)
 	Assert(",", string(token.Value), t)
@@ -40,8 +47,12 @@ func TestGetSequentialTokens(t *testing.T) {
 func TestGetNextTokenReturnsNilWhenNoMatch(t *testing.T) {
 	lex := New([]byte("One"))
 	var token *CsvToken
+	var err error
 	for i := 0; i < 2; i++ {
-		token = lex.GetNext()
+		token, err = lex.GetNext()
+		if err != nil {
+			t.Errorf(err.Error())
+		}
 	}
 	if token != nil {
 		t.Error("Expected token to be nil")
@@ -50,7 +61,11 @@ func TestGetNextTokenReturnsNilWhenNoMatch(t *testing.T) {
 
 func TestLexAll(t *testing.T) {
 	lex := New([]byte(`One,Two` + "\n" + `"Three","Four"`))
-	tokens := lex.LexAll()
+	tokens, err := lex.LexAll()
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	AssertToken(PlainFieldToken, "One", tokens[0], t)
 	AssertToken(FieldSeparatorToken, ",", tokens[1], t)
@@ -59,4 +74,13 @@ func TestLexAll(t *testing.T) {
 	AssertToken(QuotedFieldToken, `"Three"`, tokens[4], t)
 	AssertToken(FieldSeparatorToken, ",", tokens[5], t)
 	AssertToken(QuotedFieldToken, `"Four"`, tokens[6], t)
+}
+
+func TestInvalidCharacterReturnsError(t *testing.T) {
+	lex := New([]byte(`"`))
+	token, err := lex.GetNext()
+	if token != nil {
+		t.Error("Was expecting token to be nil")
+	}
+	AssertNotNull(err, t)
 }

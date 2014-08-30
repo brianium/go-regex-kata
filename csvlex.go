@@ -2,6 +2,7 @@ package regexkata
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -49,11 +50,27 @@ func New(src []byte) *CsvLexer {
 	return &CsvLexer{Src: src, Pattern: compile()}
 }
 
-func (l *CsvLexer) GetNext() (token *CsvToken) {
+type LexError struct {
+	Offset int
+	Bytes  []byte
+}
+
+func NewError(offset int, bytes []byte) error {
+	return &LexError{Offset: offset, Bytes: bytes}
+}
+
+func (e *LexError) Error() string {
+	return fmt.Sprintf("Invalid sequence %q at offset %d", string(e.Bytes), e.Offset)
+}
+
+func (l *CsvLexer) GetNext() (token *CsvToken, e error) {
 	subject := l.Src[l.offset:]
+	if len(subject) == 0 {
+		return nil, nil
+	}
 	indexes := l.Pattern.FindSubmatchIndex(subject)
 	if indexes == nil {
-		return nil
+		return nil, NewError(l.offset, subject)
 	}
 	indexes = indexes[2:]
 	var index int
@@ -65,15 +82,21 @@ func (l *CsvLexer) GetNext() (token *CsvToken) {
 	}
 	token = &CsvToken{Token: tokens[index/2], Value: subject[0:indexes[index]]}
 	l.offset = l.offset + indexes[index]
-	return
+	return token, nil
 }
 
-func (l *CsvLexer) LexAll() []*CsvToken {
+func (l *CsvLexer) LexAll() ([]*CsvToken, error) {
 	tokens := make([]*CsvToken, 0)
-	token := l.GetNext()
+	token, err := l.GetNext()
+	if err != nil {
+		return nil, err
+	}
 	for token != nil {
 		tokens = append(tokens, token)
-		token = l.GetNext()
+		token, err = l.GetNext()
+		if err != nil {
+			return nil, err
+		}
 	}
-	return tokens
+	return tokens, nil
 }
